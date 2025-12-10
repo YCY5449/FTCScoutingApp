@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>FTC Scouting App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+            padding: 10px;
+            padding-bottom: 20px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2c5aa0 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .header .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .form-section {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        
+        .form-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .form-group {
+            flex: 1;
+        }
+        
+        .form-group.full-width {
+            flex: 1 1 100%;
+        }
+        
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 6px;
+        }
+        
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 15px;
+            background-color: #fff;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #2c5aa0;
+            box-shadow: 0 0 0 2px rgba(44, 90, 160, 0.1);
+        }
+        
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 12px;
+            padding-right: 35px;
+        }
+        
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1e3a5f;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 8px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            background-color: #f8f8f8;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+        
+        .checkbox-item label {
+            margin: 0;
+            font-size: 14px;
+            font-weight: normal;
+            cursor: pointer;
+            flex: 1;
+        }
+        
+        .counter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        
+        .counter-label {
+            font-size: 14px;
+            min-width: 80px;
+        }
+        
+        .counter-controls {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .counter-btn {
+            background-color: #f0f0f0;
+            border: none;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        
+        .counter-btn:active {
+            background-color: #e0e0e0;
+        }
+        
+        .counter-value {
+            width: 50px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 0 10px;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        
+        .submit-btn:active {
+            transform: scale(0.98);
+            box-shadow: 0 1px 4px rgba(40, 167, 69, 0.3);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            background-color: white;
+            transition: background-color 0.2s;
+        }
+        
+        .action-btn:active {
+            background-color: #f0f0f0;
+        }
+        
+        .action-btn.export {
+            background-color: #2c5aa0;
+            color: white;
+            border-color: #2c5aa0;
+        }
+        
+        .action-btn.export:active {
+            background-color: #1e3a5f;
+        }
+        
+        .data-count {
+            text-align: center;
+            padding: 12px;
+            background-color: #e8f4fd;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #1e3a5f;
+        }
+        
+        .field-image {
+            width: 20%;
+            max-width: 150px;
+            height: auto;
+            margin-top: 6px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            display: block;
+        }
+        
+        .field-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #555;
+            margin-top: 12px;
+            margin-bottom: 6px;
+        }
+        
+        @media (max-width: 480px) {
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .counter-group {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+        
+        /* Prevent iOS Safari zoom */
+        input[type="text"],
+        input[type="number"],
+        select {
+            font-size: 16px !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>12527 FTC Scouting App</h1>
+        </div>
+        
+        <form id="scouting-form">
+            <div class="form-section">
+                <div class="section-title">Pre-Match</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="match-number">Match Number</label>
+                        <input type="number" id="match-number" placeholder="Enter match number">
+                    </div>
+                    <div class="form-group">
+                        <label for="team-number">Team Number</label>
+                        <input type="number" id="team-number" placeholder="Enter team number">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="alliance-color">Alliance Color</label>
+                        <select id="alliance-color">
+                            <option value="">Select</option>
+                            <option value="Red">Red</option>
+                            <option value="Blue">Blue</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="starting-position">Starting Position</label>
+                        <select id="starting-position">
+                            <option value="">Select</option>
+                            <option value="1">1 (Top Right)</option>
+                            <option value="2">2 (Top Left)</option>
+                            <option value="3">3 (Bottom Left)</option>
+                            <option value="4">4 (Bottom Right)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="pre-can-deal" name="pre-match">
+                        <label for="pre-can-deal">Can Deal With Pattern</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="pre-cannot" name="pre-match">
+                        <label for="pre-cannot">Cannot</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <div class="section-title">Autonomous</div>
+                <div class="counter-group">
+                    <div class="counter-label">Scored At Near:</div>
+                    <div class="counter-controls">
+                        <button type="button" class="counter-btn" id="auto-near-dec">−</button>
+                        <div class="counter-value" id="auto-near-count">0</div>
+                        <button type="button" class="counter-btn" id="auto-near-inc">+</button>
+                    </div>
+                </div>
+                <div class="counter-group">
+                    <div class="counter-label">Scored At Far:</div>
+                    <div class="counter-controls">
+                        <button type="button" class="counter-btn" id="auto-far-dec">−</button>
+                        <div class="counter-value" id="auto-far-count">0</div>
+                        <button type="button" class="counter-btn" id="auto-far-inc">+</button>
+                    </div>
+                </div>
+                <div class="counter-group">
+                    <div class="counter-label">Off Target:</div>
+                    <div class="counter-controls">
+                        <button type="button" class="counter-btn" id="auto-off-dec">−</button>
+                        <div class="counter-value" id="auto-off-count">0</div>
+                        <button type="button" class="counter-btn" id="auto-off-inc">+</button>
+                    </div>
+                </div>
+                <div class="checkbox-group" style="margin-top: 12px;">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="auto-left-zone" name="autonomous">
+                        <label for="auto-left-zone">Left Starting Zone</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <div class="section-title">Tele-Op</div>
+                <div class="counter-group">
+                    <div class="counter-label">Scored At Near:</div>
+                    <div class="counter-controls">
+                        <button type="button" class="counter-btn" id="tele-near-dec">−</button>
+                        <div class="counter-value" id="tele-near-count">0</div>
+                        <button type="button" class="counter-btn" id="tele-near-inc">+</button>
+                    </div>
+                </div>
+                <div class="counter-group">
+                    <div class="counter-label">Scored At Far:</div>
+                    <div class="counter-controls">
+                        <button type="button" class="counter-btn" id="tele-far-dec">−</button>
+                        <div class="counter-value" id="tele-far-count">0</div>
+                        <button type="button" class="counter-btn" id="tele-far-inc">+</button>
+                    </div>
+                </div>
+                <div class="counter-group">
+                    <div class="counter-label">Off Target:</div>
+                    <div class="counter-controls">
+                        <button type="button" class="counter-btn" id="tele-off-dec">−</button>
+                        <div class="counter-value" id="tele-off-count">0</div>
+                        <button type="button" class="counter-btn" id="tele-off-inc">+</button>
+                    </div>
+                </div>
+                <div class="checkbox-group" style="margin-top: 12px;">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="tele-defense" name="tele-op">
+                        <label for="tele-defense">Defense</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <div class="section-title">End Game</div>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="end-partially" name="end-game">
+                        <label for="end-partially">Partially</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="end-fully" name="end-game">
+                        <label for="end-fully">Fully</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="end-double-parked" name="end-game">
+                        <label for="end-double-parked">Double Park Dealer</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="end-beneficiary" name="end-game">
+                        <label for="end-beneficiary">Double Park Beneficiary</label>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top: 12px;">
+                    <label for="end-remarks">Remarks</label>
+                    <input type="text" id="end-remarks" placeholder="Enter remarks">
+                </div>
+            </div>
+            <div class="form-group" style="margin-top: 12px;">
+                <label for="submitter-name">Submitter</label>
+                <input type="text" id="submitter-name" placeholder="Enter submitter name">
+            </div>
+
+            <button type="submit" class="submit-btn">Submit</button>
+        </form>
+        
+        <div class="data-count" id="data-count">
+            Saved 0 records
+        </div>
+        
+        <div class="action-buttons">
+            <button type="button" class="action-btn export" id="export-btn">Export CSV</button>
+            <button type="button" class="action-btn" id="clear-all-btn">Clear Data</button>
+        </div>
+    </div>
+    
+    <script>
+        // Counter state
+        const counters = {
+            autoNear: 0,
+            autoFar: 0,
+            autoOff: 0,
+            teleNear: 0,
+            teleFar: 0,
+            teleOff: 0
+        };
+        
+        // Load data from local storage
+        let scoutingData = JSON.parse(localStorage.getItem('scoutingData')) || [];
+        let submitterName = localStorage.getItem('submitterName') || '';
+        
+        // Update data count display
+        function updateDataCount() {
+            document.getElementById('data-count').textContent = `Saved ${scoutingData.length} records`;
+        }
+        
+        // Update counter display
+        function updateCounters() {
+            document.getElementById('auto-near-count').textContent = counters.autoNear;
+            document.getElementById('auto-far-count').textContent = counters.autoFar;
+            document.getElementById('auto-off-count').textContent = counters.autoOff;
+            document.getElementById('tele-near-count').textContent = counters.teleNear;
+            document.getElementById('tele-far-count').textContent = counters.teleFar;
+            document.getElementById('tele-off-count').textContent = counters.teleOff;
+        }
+        
+        // Counter button events
+        function setupCounter(decId, incId, counterKey) {
+            document.getElementById(decId).addEventListener('click', () => {
+                if (counters[counterKey] > 0) {
+                    counters[counterKey]--;
+                    updateCounters();
+                }
+            });
+            
+            document.getElementById(incId).addEventListener('click', () => {
+                counters[counterKey]++;
+                updateCounters();
+            });
+        }
+        
+        setupCounter('auto-near-dec', 'auto-near-inc', 'autoNear');
+        setupCounter('auto-far-dec', 'auto-far-inc', 'autoFar');
+        setupCounter('auto-off-dec', 'auto-off-inc', 'autoOff');
+        setupCounter('tele-near-dec', 'tele-near-inc', 'teleNear');
+        setupCounter('tele-far-dec', 'tele-far-inc', 'teleFar');
+        setupCounter('tele-off-dec', 'tele-off-inc', 'teleOff');
+        
+        function validateForm() {
+            const matchNumberInput = document.getElementById('match-number');
+            const teamNumberInput = document.getElementById('team-number');
+            const allianceSelect = document.getElementById('alliance-color');
+            const startingSelect = document.getElementById('starting-position');
+            const submitterInput = document.getElementById('submitter-name');
+            const remarksInput = document.getElementById('end-remarks');
+            const canDeal = document.getElementById('pre-can-deal').checked;
+            const cannot = document.getElementById('pre-cannot').checked;
+
+            const matchNumber = parseInt(matchNumberInput.value, 10);
+            if (isNaN(matchNumber) || matchNumber < 1 || matchNumber > 1000) {
+                alert('Match Number must be a number between 1 and 1000.');
+                matchNumberInput.focus();
+                return false;
+            }
+
+            const teamNumberValue = parseInt(teamNumberInput.value.trim(), 10);
+            if (isNaN(teamNumberValue) || teamNumberValue < 1 || teamNumberValue > 100000) {
+                alert('Team Number must be a number between 1 and 100000.');
+                teamNumberInput.focus();
+                return false;
+            }
+
+            if (!allianceSelect.value) {
+                alert('Alliance Color is required.');
+                allianceSelect.focus();
+                return false;
+            }
+
+            if (!startingSelect.value) {
+                alert('Starting Position is required.');
+                startingSelect.focus();
+                return false;
+            }
+
+            if ((canDeal && cannot) || (!canDeal && !cannot)) {
+                alert('Select exactly one of Can Deal With Pattern or Cannot.');
+                return false;
+            }
+
+            const endSelections = [
+                document.getElementById('end-partially').checked,
+                document.getElementById('end-fully').checked,
+                document.getElementById('end-double-parked').checked,
+                document.getElementById('end-beneficiary').checked
+            ].filter(Boolean).length;
+            if (endSelections !== 1) {
+                alert('Select exactly one End Game option.');
+                return false;
+            }
+
+            if (!remarksInput.value.trim()) {
+                alert('Remarks is required.');
+                remarksInput.focus();
+                return false;
+            }
+
+            if (!submitterInput.value.trim()) {
+                alert('Submitter is required.');
+                submitterInput.focus();
+                return false;
+            }
+
+            return true;
+        }
+
+        // Form submission
+        document.getElementById('scouting-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!validateForm()) {
+                return;
+            }
+            
+            // Collect form data
+            const matchNumber = document.getElementById('match-number').value;
+            const teamNumber = document.getElementById('team-number').value;
+            const allianceColor = document.getElementById('alliance-color').value;
+            const startingPosition = document.getElementById('starting-position').value;
+            const submitterInput = document.getElementById('submitter-name');
+            const submitter = submitterInput.value;
+            
+            // Collect checkbox data
+            const preMatch = [];
+            if (document.getElementById('pre-can-deal').checked) preMatch.push('Can Deal With Pattern');
+            if (document.getElementById('pre-cannot').checked) preMatch.push('Cannot');
+            
+            const autonomous = {
+                near: counters.autoNear,
+                far: counters.autoFar,
+                off: counters.autoOff,
+                leftStartingZone: document.getElementById('auto-left-zone').checked
+            };
+            
+            const endGame = [];
+            if (document.getElementById('end-partially').checked) endGame.push('Partially');
+            if (document.getElementById('end-fully').checked) endGame.push('Fully');
+            if (document.getElementById('end-double-parked').checked) endGame.push('Double Park Dealer');
+            if (document.getElementById('end-beneficiary').checked) endGame.push('Double Park Beneficiary');
+            
+            const endRemarks = document.getElementById('end-remarks').value;
+            
+            // Create data object
+            const data = {
+                id: Date.now(),
+                timestamp: new Date().toISOString(),
+                matchNumber: matchNumber,
+                teamNumber: teamNumber,
+                allianceColor: allianceColor,
+                startingPosition: startingPosition,
+                submitter: submitter,
+                preMatch: preMatch.join('; '),
+                autonomous: autonomous,
+                teleOp: {
+                    near: counters.teleNear,
+                    far: counters.teleFar,
+                    off: counters.teleOff,
+                    defense: document.getElementById('tele-defense').checked
+                },
+                endGame: endGame.join('; '),
+                endRemarks: endRemarks
+            };
+            
+            // Save to local storage
+            scoutingData.push(data);
+            localStorage.setItem('scoutingData', JSON.stringify(scoutingData));
+            localStorage.setItem('submitterName', submitter);
+            submitterName = submitter;
+            
+            // Update count
+            updateDataCount();
+            
+            // Reset form
+            resetForm();
+            
+            // Show success message
+            alert(`Data saved!\nTotal records: ${scoutingData.length}`);
+        });
+        
+        // Reset form
+        function resetForm() {
+            const submitterInput = document.getElementById('submitter-name');
+            const submitterValue = submitterInput.value;
+
+            document.getElementById('scouting-form').reset();
+            submitterInput.value = submitterValue || submitterName || '';
+            counters.autoNear = 0;
+            counters.autoFar = 0;
+            counters.autoOff = 0;
+            counters.teleNear = 0;
+            counters.teleFar = 0;
+            counters.teleOff = 0;
+            updateCounters();
+        }
+        
+        // Export CSV
+        document.getElementById('export-btn').addEventListener('click', function() {
+            if (scoutingData.length === 0) {
+                alert('No data to export');
+                return;
+            }
+            
+            // CSV header row
+            const headers = [
+                'Match Number',
+                'Team Number',
+                'Alliance Color',
+                'Starting Position',
+                'Submitter',
+                'Pre-Match',
+                'Auto Scored At Near',
+                'Auto Scored At Far',
+                'Auto Off Target',
+                'Auto Left Starting Zone',
+                'Tele-Op Scored At Near',
+                'Tele-Op Scored At Far',
+                'Tele-Op Off Target',
+                'Tele-Op Defense',
+                'End Game',
+                'End Game Remarks',
+                'Timestamp'
+            ];
+            
+            // Build CSV content
+            let csvContent = headers.join(',') + '\n';
+            
+            scoutingData.forEach(item => {
+                // Handle old data format (compatibility)
+                let autoNear = 0, autoFar = 0, autoOff = 0, autoLeftZone = false;
+                if (typeof item.autonomous === 'object' && item.autonomous !== null) {
+                    // New format
+                    autoNear = item.autonomous.near || 0;
+                    autoFar = item.autonomous.far || 0;
+                    autoOff = item.autonomous.off || 0;
+                    // Old format compatibility (speaker/amp/trap)
+                    if (autoNear === 0 && autoFar === 0 && autoOff === 0) {
+                        autoNear = item.autonomous.speaker || 0;
+                        autoFar = item.autonomous.amp || 0;
+                        autoOff = item.autonomous.trap || 0;
+                    }
+                    autoLeftZone = item.autonomous.leftStartingZone || false;
+                }
+                
+                // Handle Tele-Op data (compatible with old format)
+                let teleNear = 0, teleFar = 0, teleOff = 0, teleDefense = false;
+                if (item.teleOp) {
+                    teleNear = item.teleOp.near || 0;
+                    teleFar = item.teleOp.far || 0;
+                    teleOff = item.teleOp.off || 0;
+                    teleDefense = item.teleOp.defense || false;
+                    // Old format compatibility
+                    if (teleNear === 0 && teleFar === 0 && teleOff === 0) {
+                        teleNear = item.teleOp.speaker || 0;
+                        teleFar = item.teleOp.amp || 0;
+                        teleOff = item.teleOp.trap || 0;
+                    }
+                }
+                
+                const row = [
+                    `"${item.matchNumber || ''}"`,
+                    `"${item.teamNumber || ''}"`,
+                    `"${item.allianceColor || ''}"`,
+                    `"${item.startingPosition || ''}"`,
+                    `"${(item.submitter || '').replace(/"/g, '""')}"`,
+                    `"${(item.preMatch || '').replace(/"/g, '""')}"`,
+                    `"${autoNear}"`,
+                    `"${autoFar}"`,
+                    `"${autoOff}"`,
+                    `"${autoLeftZone ? 'Yes' : 'No'}"`,
+                    `"${teleNear}"`,
+                    `"${teleFar}"`,
+                    `"${teleOff}"`,
+                    `"${teleDefense ? 'Yes' : 'No'}"`,
+                    `"${(item.endGame || '').replace(/"/g, '""')}"`,
+                    `"${(item.endRemarks || '').replace(/"/g, '""')}"`,
+                    `"${item.timestamp || ''}"`
+                ];
+                csvContent += row.join(',') + '\n';
+            });
+            
+            // Create download link (add BOM to support Excel display)
+            const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `FTC_Scouting_Data_${new Date().toISOString().slice(0,10)}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        });
+        
+        // Clear all data
+        document.getElementById('clear-all-btn').addEventListener('click', function() {
+            if (confirm('Are you sure you want to clear all saved data? This action cannot be undone.')) {
+                scoutingData = [];
+                localStorage.setItem('scoutingData', JSON.stringify(scoutingData));
+                updateDataCount();
+                alert('All data cleared');
+            }
+        });
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCounters();
+            updateDataCount();
+            const submitterInput = document.getElementById('submitter-name');
+            if (submitterName) {
+                submitterInput.value = submitterName;
+            }
+        });
+        
+        // Prevent iOS Safari double-tap zoom
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(event) {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    </script>
+</body>
+</html>
