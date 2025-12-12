@@ -439,6 +439,10 @@
                         <input type="checkbox" id="end-beneficiary" name="end-game">
                         <label for="end-beneficiary">Double Park Beneficiary</label>
                     </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="end-no-climb" name="end-game">
+                        <label for="end-no-climb">No Climb</label>
+                    </div>
                 </div>
                 <div class="form-group" style="margin-top: 12px;">
                     <label for="end-remarks">Remarks</label>
@@ -560,7 +564,8 @@
                 document.getElementById('end-partially').checked,
                 document.getElementById('end-fully').checked,
                 document.getElementById('end-double-parked').checked,
-                document.getElementById('end-beneficiary').checked
+                document.getElementById('end-beneficiary').checked,
+                document.getElementById('end-no-climb').checked
             ].filter(Boolean).length;
             if (endSelections !== 1) {
                 alert('Select exactly one End Game option.');
@@ -614,6 +619,7 @@
             if (document.getElementById('end-fully').checked) endGame.push('Fully');
             if (document.getElementById('end-double-parked').checked) endGame.push('Double Park Dealer');
             if (document.getElementById('end-beneficiary').checked) endGame.push('Double Park Beneficiary');
+            if (document.getElementById('end-no-climb').checked) endGame.push('No Climb');
             
             const endRemarks = document.getElementById('end-remarks').value;
             
