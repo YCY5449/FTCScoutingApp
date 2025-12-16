@@ -357,25 +357,31 @@
                 <div class="counter-group">
                     <div class="counter-label">Scored At Near:</div>
                     <div class="counter-controls">
-                        <button type="button" class="counter-btn" id="auto-near-dec">−</button>
+                        <button type="button" class="counter-btn" id="auto-near-dec-3">−3</button>
+                        <button type="button" class="counter-btn" id="auto-near-dec">−1</button>
                         <div class="counter-value" id="auto-near-count">0</div>
-                        <button type="button" class="counter-btn" id="auto-near-inc">+</button>
+                        <button type="button" class="counter-btn" id="auto-near-inc">+1</button>
+                        <button type="button" class="counter-btn" id="auto-near-inc-3">+3</button>
                     </div>
                 </div>
                 <div class="counter-group">
                     <div class="counter-label">Scored At Far:</div>
                     <div class="counter-controls">
-                        <button type="button" class="counter-btn" id="auto-far-dec">−</button>
+                        <button type="button" class="counter-btn" id="auto-far-dec-3">−3</button>
+                        <button type="button" class="counter-btn" id="auto-far-dec">−1</button>
                         <div class="counter-value" id="auto-far-count">0</div>
-                        <button type="button" class="counter-btn" id="auto-far-inc">+</button>
+                        <button type="button" class="counter-btn" id="auto-far-inc">+1</button>
+                        <button type="button" class="counter-btn" id="auto-far-inc-3">+3</button>
                     </div>
                 </div>
                 <div class="counter-group">
                     <div class="counter-label">Off Target:</div>
                     <div class="counter-controls">
-                        <button type="button" class="counter-btn" id="auto-off-dec">−</button>
+                        <button type="button" class="counter-btn" id="auto-off-dec-3">−3</button>
+                        <button type="button" class="counter-btn" id="auto-off-dec">−1</button>
                         <div class="counter-value" id="auto-off-count">0</div>
-                        <button type="button" class="counter-btn" id="auto-off-inc">+</button>
+                        <button type="button" class="counter-btn" id="auto-off-inc">+1</button>
+                        <button type="button" class="counter-btn" id="auto-off-inc-3">+3</button>
                     </div>
                 </div>
                 <div class="checkbox-group" style="margin-top: 12px;">
@@ -391,25 +397,31 @@
                 <div class="counter-group">
                     <div class="counter-label">Scored At Near:</div>
                     <div class="counter-controls">
-                        <button type="button" class="counter-btn" id="tele-near-dec">−</button>
+                        <button type="button" class="counter-btn" id="tele-near-dec-3">−3</button>
+                        <button type="button" class="counter-btn" id="tele-near-dec">−1</button>
                         <div class="counter-value" id="tele-near-count">0</div>
-                        <button type="button" class="counter-btn" id="tele-near-inc">+</button>
+                        <button type="button" class="counter-btn" id="tele-near-inc">+1</button>
+                        <button type="button" class="counter-btn" id="tele-near-inc-3">+3</button>
                     </div>
                 </div>
                 <div class="counter-group">
                     <div class="counter-label">Scored At Far:</div>
                     <div class="counter-controls">
-                        <button type="button" class="counter-btn" id="tele-far-dec">−</button>
+                        <button type="button" class="counter-btn" id="tele-far-dec-3">−3</button>
+                        <button type="button" class="counter-btn" id="tele-far-dec">−1</button>
                         <div class="counter-value" id="tele-far-count">0</div>
-                        <button type="button" class="counter-btn" id="tele-far-inc">+</button>
+                        <button type="button" class="counter-btn" id="tele-far-inc">+1</button>
+                        <button type="button" class="counter-btn" id="tele-far-inc-3">+3</button>
                     </div>
                 </div>
                 <div class="counter-group">
                     <div class="counter-label">Off Target:</div>
                     <div class="counter-controls">
-                        <button type="button" class="counter-btn" id="tele-off-dec">−</button>
+                        <button type="button" class="counter-btn" id="tele-off-dec-3">−3</button>
+                        <button type="button" class="counter-btn" id="tele-off-dec">−1</button>
                         <div class="counter-value" id="tele-off-count">0</div>
-                        <button type="button" class="counter-btn" id="tele-off-inc">+</button>
+                        <button type="button" class="counter-btn" id="tele-off-inc">+1</button>
+                        <button type="button" class="counter-btn" id="tele-off-inc-3">+3</button>
                     </div>
                 </div>
                 <div class="checkbox-group" style="margin-top: 12px;">
@@ -498,26 +510,35 @@
         }
         
         // Counter button events
-        function setupCounter(decId, incId, counterKey) {
+        function setupCounter(decId, incId, counterKey, delta = 1) {
             document.getElementById(decId).addEventListener('click', () => {
-                if (counters[counterKey] > 0) {
-                    counters[counterKey]--;
+                if (counters[counterKey] - delta >= 0) {
+                    counters[counterKey] -= delta;
+                    updateCounters();
+                } else if (counters[counterKey] > 0) {
+                    counters[counterKey] = 0;
                     updateCounters();
                 }
             });
             
             document.getElementById(incId).addEventListener('click', () => {
-                counters[counterKey]++;
+                counters[counterKey] += delta;
                 updateCounters();
             });
         }
         
-        setupCounter('auto-near-dec', 'auto-near-inc', 'autoNear');
-        setupCounter('auto-far-dec', 'auto-far-inc', 'autoFar');
-        setupCounter('auto-off-dec', 'auto-off-inc', 'autoOff');
-        setupCounter('tele-near-dec', 'tele-near-inc', 'teleNear');
-        setupCounter('tele-far-dec', 'tele-far-inc', 'teleFar');
-        setupCounter('tele-off-dec', 'tele-off-inc', 'teleOff');
+        setupCounter('auto-near-dec', 'auto-near-inc', 'autoNear', 1);
+        setupCounter('auto-near-dec-3', 'auto-near-inc-3', 'autoNear', 3);
+        setupCounter('auto-far-dec', 'auto-far-inc', 'autoFar', 1);
+        setupCounter('auto-far-dec-3', 'auto-far-inc-3', 'autoFar', 3);
+        setupCounter('auto-off-dec', 'auto-off-inc', 'autoOff', 1);
+        setupCounter('auto-off-dec-3', 'auto-off-inc-3', 'autoOff', 3);
+        setupCounter('tele-near-dec', 'tele-near-inc', 'teleNear', 1);
+        setupCounter('tele-near-dec-3', 'tele-near-inc-3', 'teleNear', 3);
+        setupCounter('tele-far-dec', 'tele-far-inc', 'teleFar', 1);
+        setupCounter('tele-far-dec-3', 'tele-far-inc-3', 'teleFar', 3);
+        setupCounter('tele-off-dec', 'tele-off-inc', 'teleOff', 1);
+        setupCounter('tele-off-dec-3', 'tele-off-inc-3', 'teleOff', 3);
         
         function validateForm() {
             const matchNumberInput = document.getElementById('match-number');
