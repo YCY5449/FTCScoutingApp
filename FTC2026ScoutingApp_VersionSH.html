@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>FTC Scouting App</title>
+    <title>FTC Scouting App - SH Version</title>
     <style>
         * {
             margin: 0;
@@ -99,6 +99,22 @@
             outline: none;
             border-color: #2c5aa0;
             box-shadow: 0 0 0 2px rgba(44, 90, 160, 0.1);
+        }
+        
+        input.error {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.1);
+        }
+        
+        .error-message {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
         }
         
         select {
@@ -370,7 +386,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>12527 FTC Scouting App</h1>
+            <h1>FTC Scouting App - SH Version</h1>
         </div>
         
         <form id="scouting-form">
@@ -384,6 +400,7 @@
                     <div class="form-group">
                         <label for="team-number">Team Number</label>
                         <input type="number" id="team-number" placeholder="Enter team number">
+                        <div class="error-message" id="team-number-error">Team number must be in the SH team list.</div>
                     </div>
                 </div>
                 
@@ -528,6 +545,14 @@
     </div>
     
     <script>
+        // SH Team List - Valid team numbers
+        const SH_TEAM_LIST = [
+            8347, 12527, 12630, 16095, 16107, 19392, 19395, 19419, 19600, 19601,
+            19605, 19666, 19725, 19726, 19965, 22232, 22389, 22404, 22406, 22715,
+            23845, 24306, 24393, 24599, 25720, 26296, 27501, 27571, 27573, 27648,
+            27650, 30319, 30676, 30844, 31558, 31596, 32008, 32009, 32235, 32238
+        ];
+        
         // Sequence state - arrays to store the sequence of values
         // Each entry represents a cycle with the value added (1, 2, or 3)
         // Off target is automatically calculated as 3 - value
@@ -633,6 +658,20 @@
                 alert('Team Number must be a number between 1 and 100000.');
                 teamNumberInput.focus();
                 return false;
+            }
+            
+            // Validate team number is in SH team list
+            if (!SH_TEAM_LIST.includes(teamNumberValue)) {
+                const errorMsg = document.getElementById('team-number-error');
+                teamNumberInput.classList.add('error');
+                errorMsg.classList.add('show');
+                alert('Team number must be in the SH team list. Please enter a valid SH team number.');
+                teamNumberInput.focus();
+                return false;
+            } else {
+                // Remove error styling if valid
+                teamNumberInput.classList.remove('error');
+                document.getElementById('team-number-error').classList.remove('show');
             }
 
             if (!allianceSelect.value) {
@@ -960,6 +999,48 @@
                 localStorage.setItem('scoutingData', JSON.stringify(scoutingData));
                 updateDataCount();
                 alert('All data cleared');
+            }
+        });
+        
+        // Real-time team number validation
+        document.getElementById('team-number').addEventListener('input', function() {
+            const teamNumberInput = this;
+            const teamNumberValue = parseInt(teamNumberInput.value.trim(), 10);
+            const errorMsg = document.getElementById('team-number-error');
+            
+            if (teamNumberInput.value.trim() === '') {
+                // Empty input - remove error styling
+                teamNumberInput.classList.remove('error');
+                errorMsg.classList.remove('show');
+            } else if (!isNaN(teamNumberValue) && SH_TEAM_LIST.includes(teamNumberValue)) {
+                // Valid team number
+                teamNumberInput.classList.remove('error');
+                errorMsg.classList.remove('show');
+            } else if (!isNaN(teamNumberValue)) {
+                // Invalid team number
+                teamNumberInput.classList.add('error');
+                errorMsg.classList.add('show');
+            }
+        });
+        
+        // Real-time team number validation
+        document.getElementById('team-number').addEventListener('input', function() {
+            const teamNumberInput = this;
+            const teamNumberValue = parseInt(teamNumberInput.value.trim(), 10);
+            const errorMsg = document.getElementById('team-number-error');
+            
+            if (teamNumberInput.value.trim() === '') {
+                // Empty input - remove error styling
+                teamNumberInput.classList.remove('error');
+                errorMsg.classList.remove('show');
+            } else if (!isNaN(teamNumberValue) && SH_TEAM_LIST.includes(teamNumberValue)) {
+                // Valid team number
+                teamNumberInput.classList.remove('error');
+                errorMsg.classList.remove('show');
+            } else if (!isNaN(teamNumberValue)) {
+                // Invalid team number
+                teamNumberInput.classList.add('error');
+                errorMsg.classList.add('show');
             }
         });
         

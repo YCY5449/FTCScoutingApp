@@ -69,26 +69,49 @@ def main():
         "auto_far_avg",
         "tele_near_avg",
         "tele_far_avg",
+        "auto_cycles_avg",
+        "tele_cycles_avg",
+        "total_cycles_avg",
+        "auto_hit_rate",
+        "tele_hit_rate",
         "end_score_avg",
         "total_score_avg",
     ]
+    # Filter out missing columns
+    available_cols = [c for c in display_cols if c in df.columns]
     missing = [c for c in display_cols if c not in df.columns]
     if missing:
-        st.error(f"Missing columns in CSV: {missing}")
+        st.warning(f"Some columns missing (may be from old data format): {missing}")
+    
+    if not available_cols:
+        st.error("No valid columns found in CSV.")
         return
 
-    df_display = df[display_cols].rename(
-        columns={
-            "Team Number": "Team",
-            "matches": "Played",
-            "auto_near_avg": "Auto Near AVG",
-            "auto_far_avg": "Auto Far AVG",
-            "tele_near_avg": "Tele Near AVG",
-            "tele_far_avg": "Tele Far AVG",
-            "end_score_avg": "End AVG",
-            "total_score_avg": "Total AVG",
-        }
-    )
+    df_display = df[available_cols].copy()
+    
+    # Rename columns
+    rename_map = {
+        "Team Number": "Team",
+        "matches": "Played",
+        "auto_near_avg": "Auto Near AVG",
+        "auto_far_avg": "Auto Far AVG",
+        "tele_near_avg": "Tele Near AVG",
+        "tele_far_avg": "Tele Far AVG",
+        "auto_cycles_avg": "Auto Cycles AVG",
+        "tele_cycles_avg": "Tele Cycles AVG",
+        "total_cycles_avg": "Total Cycles AVG",
+        "auto_hit_rate": "Auto Hit Rate",
+        "tele_hit_rate": "Tele Hit Rate",
+        "end_score_avg": "End AVG",
+        "total_score_avg": "Total AVG",
+    }
+    df_display = df_display.rename(columns={k: v for k, v in rename_map.items() if k in df_display.columns})
+    
+    # Format hit rates as percentages
+    if "Auto Hit Rate" in df_display.columns:
+        df_display["Auto Hit Rate"] = df_display["Auto Hit Rate"].apply(lambda x: f"{x:.2%}" if pd.notna(x) else "N/A")
+    if "Tele Hit Rate" in df_display.columns:
+        df_display["Tele Hit Rate"] = df_display["Tele Hit Rate"].apply(lambda x: f"{x:.2%}" if pd.notna(x) else "N/A")
 
     st.dataframe(
         df_display,

@@ -49,20 +49,63 @@ def load_csvs(folder: Path) -> pd.DataFrame:
     return pd.concat(frames, ignore_index=True)
 
 
+def parse_sequence(value):
+    """Parse sequence string (e.g., '1, 2, 3') or number into list of values."""
+    if pd.isna(value):
+        return []
+    if isinstance(value, str) and ',' in value:
+        # Parse sequence string
+        return [int(x.strip()) for x in value.split(',') if x.strip().isdigit()]
+    # Try to parse as number (old format)
+    try:
+        num = int(float(value))
+        return [num] if num > 0 else []
+    except (ValueError, TypeError):
+        return []
+
+
 def normalize(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     # numeric fields
     for col in [
         "Match Number",
         "Team Number",
-        "Auto Scored At Near",
-        "Auto Scored At Far",
-        "Auto Off Target",
-        "Tele-Op Scored At Near",
-        "Tele-Op Scored At Far",
-        "Tele-Op Off Target",
     ]:
         df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0).astype(int)
+    
+    # Parse sequences and calculate values
+    df["auto_near_seq"] = df["Auto Scored At Near"].apply(parse_sequence)
+    df["auto_far_seq"] = df["Auto Scored At Far"].apply(parse_sequence)
+    df["tele_near_seq"] = df["Tele-Op Scored At Near"].apply(parse_sequence)
+    df["tele_far_seq"] = df["Tele-Op Scored At Far"].apply(parse_sequence)
+    
+    # Calculate totals from sequences
+    df["Auto Scored At Near"] = df["auto_near_seq"].apply(lambda x: sum(x) if x else 0)
+    df["Auto Scored At Far"] = df["auto_far_seq"].apply(lambda x: sum(x) if x else 0)
+    df["Tele-Op Scored At Near"] = df["tele_near_seq"].apply(lambda x: sum(x) if x else 0)
+    df["Tele-Op Scored At Far"] = df["tele_far_seq"].apply(lambda x: sum(x) if x else 0)
+    
+    # Calculate off target from sequences (3 - value for each entry)
+    def combine_off_target(near_seq, far_seq):
+        near_off = [3 - v for v in near_seq]
+        far_off = [3 - v for v in far_seq]
+        return near_off + far_off
+    
+    df["auto_off_seq"] = df.apply(lambda row: combine_off_target(row["auto_near_seq"], row["auto_far_seq"]), axis=1)
+    df["tele_off_seq"] = df.apply(lambda row: combine_off_target(row["tele_near_seq"], row["tele_far_seq"]), axis=1)
+    df["Auto Off Target"] = df["auto_off_seq"].apply(lambda x: sum(x) if x else 0)
+    df["Tele-Op Off Target"] = df["tele_off_seq"].apply(lambda x: sum(x) if x else 0)
+    
+    # Get cycle counts
+    df["Auto Cycles"] = pd.to_numeric(df.get("Auto Cycles", 0), errors="coerce").fillna(
+        df["auto_near_seq"].apply(len) + df["auto_far_seq"].apply(len)
+    ).astype(int)
+    df["Tele-Op Cycles"] = pd.to_numeric(df.get("Tele-Op Cycles", 0), errors="coerce").fillna(
+        df["tele_near_seq"].apply(len) + df["tele_far_seq"].apply(len)
+    ).astype(int)
+    df["Total Cycles"] = pd.to_numeric(df.get("Total Cycles", 0), errors="coerce").fillna(
+        df["Auto Cycles"] + df["Tele-Op Cycles"]
+    ).astype(int)
 
     # End game: take first option if multiple are present
     def endgame_value(val: str) -> str:
@@ -94,6 +137,9 @@ def summarize(df: pd.DataFrame) -> pd.DataFrame:
         auto_far_sum=("Auto Scored At Far", "sum"),
         tele_near_sum=("Tele-Op Scored At Near", "sum"),
         tele_far_sum=("Tele-Op Scored At Far", "sum"),
+        auto_cycles_sum=("Auto Cycles", "sum"),
+        tele_cycles_sum=("Tele-Op Cycles", "sum"),
+        total_cycles_sum=("Total Cycles", "sum"),
         end_score_sum=("end_game_score", "sum"),
         total_score_sum=("total_score", "sum"),
     ).reset_index()
@@ -103,8 +149,21 @@ def summarize(df: pd.DataFrame) -> pd.DataFrame:
     agg["auto_far_avg"] = agg["auto_far_sum"] / agg["matches"]
     agg["tele_near_avg"] = agg["tele_near_sum"] / agg["matches"]
     agg["tele_far_avg"] = agg["tele_far_sum"] / agg["matches"]
+    agg["auto_cycles_avg"] = agg["auto_cycles_sum"] / agg["matches"]
+    agg["tele_cycles_avg"] = agg["tele_cycles_sum"] / agg["matches"]
+    agg["total_cycles_avg"] = agg["total_cycles_sum"] / agg["matches"]
     agg["end_score_avg"] = agg["end_score_sum"] / agg["matches"]
     agg["total_score_avg"] = agg["total_score_sum"] / agg["matches"]
+    
+    # Calculate hit rates (命中率)
+    # Hit rate = average score / max score (3)
+    # Auto hit rate = (auto near + auto far) total value / (auto near + auto far) total cycles / 3
+    # Tele hit rate = (tele near + tele far) total value / (tele near + tele far) total cycles / 3
+    agg["auto_hit_rate"] = (agg["auto_near_sum"] + agg["auto_far_sum"]) / (agg["auto_cycles_sum"] * 3).replace(0, 1)
+    agg["tele_hit_rate"] = (agg["tele_near_sum"] + agg["tele_far_sum"]) / (agg["tele_cycles_sum"] * 3).replace(0, 1)
+    # Replace inf with 0 (when cycles is 0)
+    agg["auto_hit_rate"] = agg["auto_hit_rate"].replace([float('inf'), -float('inf')], 0)
+    agg["tele_hit_rate"] = agg["tele_hit_rate"].replace([float('inf'), -float('inf')], 0)
 
     agg = agg.sort_values("Team Number")
 
@@ -117,12 +176,20 @@ def summarize(df: pd.DataFrame) -> pd.DataFrame:
             "auto_far_avg",
             "tele_near_avg",
             "tele_far_avg",
+            "auto_cycles_avg",
+            "tele_cycles_avg",
+            "total_cycles_avg",
+            "auto_hit_rate",
+            "tele_hit_rate",
             "end_score_avg",
             "total_score_avg",
             "auto_near_sum",
             "auto_far_sum",
             "tele_near_sum",
             "tele_far_sum",
+            "auto_cycles_sum",
+            "tele_cycles_sum",
+            "total_cycles_sum",
             "end_score_sum",
             "total_score_sum",
         ]
